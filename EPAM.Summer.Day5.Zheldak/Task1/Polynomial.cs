@@ -17,6 +17,7 @@ namespace Task1
             if (coefficientArray == null)
                 throw new ArgumentNullException();
             this._coefficient = new double[coefficientArray.Length];
+            Array.Copy(coefficientArray, _coefficient, coefficientArray.Length);
             Exponent = coefficientArray.Length - 1;
         }
 
@@ -33,9 +34,9 @@ namespace Task1
         public static Polynomial operator +(Polynomial lsh, Polynomial rsh)
         {
             if (lsh == null)
-                throw new ArgumentNullException("Empty argument");
+                throw new ArgumentNullException("Argumetn is null");
             if (rsh == null)
-                throw new ArgumentNullException("Empty argument");
+                throw new ArgumentNullException("Argumetn is null");
             int max = 0;
             int min = 0;
             bool choice = true;
@@ -50,12 +51,12 @@ namespace Task1
                 min = lsh.Exponent;
                 choice = false;
             }
-            double[] coeficientArray = new double[max];
+            double[] coeficientArray = new double[max + 1];
             if (choice)
                 lsh._coefficient.CopyTo(coeficientArray, 0);
             else
                 rsh._coefficient.CopyTo(coeficientArray, 0);
-            for (int i = 0; i < min; i++)
+            for (int i = 0; i < min + 1; i++)
             {
                 if (choice)
                     coeficientArray[i] = coeficientArray[i] + rsh._coefficient[i];
@@ -80,9 +81,9 @@ namespace Task1
             {
                 double[] coeficientArray = new double[lsh._coefficient.Length];
                 lsh._coefficient.CopyTo(coeficientArray, 0);
-                for (int i = 0; i < rsh.Exponent; i++)
+                for (int i = 0; i < rsh.Exponent + 1; i++)
                 {
-                    coeficientArray[i] = coeficientArray[i] + rsh._coefficient[i];
+                    coeficientArray[i] = coeficientArray[i] - rsh._coefficient[i];
                 }
                 return new Polynomial(coeficientArray);
             }
@@ -93,9 +94,9 @@ namespace Task1
                 {
                     coeficientArray[i] = rsh._coefficient[i] * (-1);
                 }
-                for (int i = 0; i < lsh.Exponent; i++)
+                for (int i = 0; i < lsh.Exponent + 1; i++)
                 {
-                    coeficientArray[i] = coeficientArray[i] - lsh._coefficient[i];
+                    coeficientArray[i] = coeficientArray[i] + lsh._coefficient[i];
                 }
                 return new Polynomial(coeficientArray);
             }
@@ -109,13 +110,13 @@ namespace Task1
         public static Polynomial operator *(Polynomial lsh, Polynomial rsh)
         {
             if (lsh == null)
-                throw new ArgumentNullException("Empty argument");
+                throw new ArgumentNullException("Argumetn is null");
             if (rsh == null)
-                throw new ArgumentNullException("Empty argument");
-            double[] coeficientArray = new double[lsh.Exponent + rsh.Exponent];
-            for (int i = 0; i < lsh.Exponent; i++)
+                throw new ArgumentNullException("Argumetn is null");
+            double[] coeficientArray = new double[lsh.Exponent + rsh.Exponent + 1];
+            for (int i = 0; i < lsh.Exponent + 1; i++)
             {
-                for (int j = 0; j < rsh.Exponent; j++)
+                for (int j = 0; j < rsh.Exponent + 1; j++)
                 {
                     coeficientArray[i + j] = coeficientArray[i + j] + lsh._coefficient[i] * rsh._coefficient[j];
                 }
@@ -175,7 +176,7 @@ namespace Task1
             if (ReferenceEquals(this, other))
                 return 0;
             if (ReferenceEquals(other, null))
-                throw new NullReferenceException();
+                throw new ArgumentNullException("Argumetn is null");
             if (Exponent > other.Exponent)
                 return 1;
             if (Exponent < other.Exponent)
@@ -190,6 +191,19 @@ namespace Task1
             }
 
             return 0;
+        }
+
+        public double GetValue(double argument)
+        {
+            if (double.IsNaN(argument) || double.IsNegativeInfinity(argument) || double.IsPositiveInfinity(argument))
+                throw new ArgumentOutOfRangeException();
+
+            double result = 0;
+            for (int i = Exponent ; i >= 0; i--)
+            {
+                result = result + _coefficient[i] * Math.Pow(argument, i);
+            }
+            return result;
         }
     }
 }
