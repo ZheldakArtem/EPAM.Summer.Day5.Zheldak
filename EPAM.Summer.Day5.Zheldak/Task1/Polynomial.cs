@@ -6,172 +6,190 @@ using System.Threading.Tasks;
 
 namespace Task1
 {
-    public class Polynomial
+    public class Polynomial : IEquatable<Polynomial>, ICloneable, IComparable<Polynomial>
     {
+        public int Exponent { get; private set; }
+        private readonly double[] _coefficient;
+        public double this[int i] => _coefficient[i];
 
-        private readonly IList<int> _coefficients;
-
-        public int ExpPolinom
+        public Polynomial(params double[] coefficientArray)
         {
-            get
+            if (coefficientArray == null)
+                throw new ArgumentNullException();
+            this._coefficient = new double[coefficientArray.Length];
+            Exponent = coefficientArray.Length - 1;
+        }
+
+        public Polynomial(Polynomial polynomial)
+        {
+            if (polynomial == null)
+                throw new ArgumentNullException();
+
+            _coefficient = new double[polynomial._coefficient.Length];
+            Exponent = polynomial.Exponent;
+            Array.Copy(polynomial._coefficient, _coefficient, polynomial._coefficient.Length);
+        }
+
+        public static Polynomial operator +(Polynomial lsh, Polynomial rsh)
+        {
+            if (lsh == null)
+                throw new ArgumentNullException("Empty argument");
+            if (rsh == null)
+                throw new ArgumentNullException("Empty argument");
+            int max = 0;
+            int min = 0;
+            bool choice = true;
+            if (lsh.Exponent >= rsh.Exponent)
             {
-                return CountCoef + 1;
-            }
-        }
-
-        public int CountCoef
-        {
-            get { return _coefficients.Count; }
-        }
-
-        public Polynomial(IList<int> coefficients)
-        {
-            if (coefficients == null)
-                throw new ArgumentException();
-
-
-            _coefficients = coefficients;
-        }
-
-        static public Polynomial operator +(Polynomial first, Polynomial second)
-        {
-            var listCoef = new List<int>();
-            if (first.ExpPolinom > second.ExpPolinom)
-            {
-                for (int i = 0; i < first.ExpPolinom + 1; i++)
-                {
-                    if (i <= second.ExpPolinom + 1)
-                        listCoef.Add(first._coefficients[i] + second._coefficients[i]);
-                    else
-                        listCoef.Add(first._coefficients[i]);
-                }
+                max = lsh.Exponent;
+                min = rsh.Exponent;
             }
             else
             {
-                for (int i = 0; i < second.ExpPolinom + 1; i++)
-                {
-                    if (i <= first.ExpPolinom + 1)
-                        listCoef.Add(first._coefficients[i] + second._coefficients[i]);
-                    else
-                        listCoef.Add(second._coefficients[i]);
-                }
+                max = rsh.Exponent;
+                min = lsh.Exponent;
+                choice = false;
             }
-
-            return new Polynomial(listCoef);
+            double[] coeficientArray = new double[max];
+            if (choice)
+                lsh._coefficient.CopyTo(coeficientArray, 0);
+            else
+                rsh._coefficient.CopyTo(coeficientArray, 0);
+            for (int i = 0; i < min; i++)
+            {
+                if (choice)
+                    coeficientArray[i] = coeficientArray[i] + rsh._coefficient[i];
+                else
+                    coeficientArray[i] = coeficientArray[i] + lsh._coefficient[i];
+            }
+            return new Polynomial(coeficientArray);
         }
 
-        static public Polynomial operator -(Polynomial first, Polynomial second)
+        public static Polynomial Addition(Polynomial lsh, Polynomial rsh)
         {
-            var listCoef = new List<int>();
-            if (first.ExpPolinom > second.ExpPolinom)
+            return lsh + rsh;
+        }
+
+        public static Polynomial operator -(Polynomial lsh, Polynomial rsh)
+        {
+            if (lsh == null)
+                throw new ArgumentNullException("Empty argument");
+            if (rsh == null)
+                throw new ArgumentNullException("Empty argument");
+            if (lsh.Exponent > rsh.Exponent)
             {
-                for (int i = 0; i < first.ExpPolinom + 1; i++)
+                double[] coeficientArray = new double[lsh._coefficient.Length];
+                lsh._coefficient.CopyTo(coeficientArray, 0);
+                for (int i = 0; i < rsh.Exponent; i++)
                 {
-                    if (i <= second.ExpPolinom + 1)
-                        listCoef.Add(first._coefficients[i] - second._coefficients[i]);
-                    else
-                        listCoef.Add(first._coefficients[i]);
+                    coeficientArray[i] = coeficientArray[i] + rsh._coefficient[i];
                 }
+                return new Polynomial(coeficientArray);
             }
             else
             {
-                for (int i = 0; i < second.ExpPolinom + 1; i++)
+                double[] coeficientArray = new double[rsh._coefficient.Length];
+                for (int i = 0; i < coeficientArray.Length; i++)
                 {
-                    if (i <= first.ExpPolinom + 1)
-                        listCoef.Add(second._coefficients[i] - first._coefficients[i]);
-                    else
-                        listCoef.Add(second._coefficients[i]);
+                    coeficientArray[i] = rsh._coefficient[i] * (-1);
+                }
+                for (int i = 0; i < lsh.Exponent; i++)
+                {
+                    coeficientArray[i] = coeficientArray[i] - lsh._coefficient[i];
+                }
+                return new Polynomial(coeficientArray);
+            }
+        }
+
+        public static Polynomial Subtraction(Polynomial lsh, Polynomial rsh)
+        {
+            return lsh - rsh;
+        }
+
+        public static Polynomial operator *(Polynomial lsh, Polynomial rsh)
+        {
+            if (lsh == null)
+                throw new ArgumentNullException("Empty argument");
+            if (rsh == null)
+                throw new ArgumentNullException("Empty argument");
+            double[] coeficientArray = new double[lsh.Exponent + rsh.Exponent];
+            for (int i = 0; i < lsh.Exponent; i++)
+            {
+                for (int j = 0; j < rsh.Exponent; j++)
+                {
+                    coeficientArray[i + j] = coeficientArray[i + j] + lsh._coefficient[i] * rsh._coefficient[j];
                 }
             }
-
-            return new Polynomial(listCoef);
+            return new Polynomial(coeficientArray);
         }
 
-        static public Polynomial operator *(Polynomial first, Polynomial second)
+        public static Polynomial Multiplication(Polynomial lsh, Polynomial rsh)
         {
-            var listCoef = new List<int>(first.CountCoef * second.CountCoef);
-            for (int i = 0; i < first.CountCoef; i++)
-            {
-                for (int j = 0; j < second.CountCoef; j++)
-                {
-                    listCoef[i + j] = first._coefficients[i] * second._coefficients[j];
-                }
-            }
-            return new Polynomial(listCoef);
+            return lsh * rsh;
         }
 
-        static public bool operator ==(Polynomial first, Polynomial second)
+        public static bool operator !=(Polynomial lsh, Polynomial rsh)
         {
-            if (first == null || second == null)
-                throw new NullReferenceException();
-
-            if (first.Equals(second))
-                return true;
-            return false;
-        }
-
-        static public bool operator !=(Polynomial first, Polynomial second)
-        {
-            if (first == null || second == null)
-                throw new NullReferenceException();
-            if (!first.Equals(second))
-                return true;
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            double sum = 0;
-            for (int i = 0; i < ExpPolinom; i++)
-            {
-                sum += _coefficients[i];
-            }
-            return sum.GetHashCode() * 137;
-        }
-
-        public bool Equals(Polynomial polinom)
-        {
-            if (polinom == null)
+            if (ReferenceEquals(lsh, rsh))
                 return false;
-            if (polinom.CountCoef != CountCoef)
-                return false;
-            for (int i = 0; i < polinom.CountCoef; i++)
-            {
-                if (_coefficients[i] != polinom._coefficients[i])
-                    return false;
-            }
-            return true;
+            return !(lsh.Equals(rsh));
+        }
+
+        public static bool operator ==(Polynomial lhs, Polynomial rhs)
+        {
+            if (!ReferenceEquals(lhs, null))
+                return lhs.Equals(rhs);
+            return ReferenceEquals(rhs, null);
         }
 
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(this, obj))
+                return true;
             if (obj == null || GetType() != obj.GetType())
             {
                 return false;
             }
-
             return Equals((Polynomial)obj);
         }
 
-        public override string ToString()
+        public bool Equals(Polynomial otherPolynomial)
         {
-            var strBuild = new StringBuilder();
-            for (int i = CountCoef-1; i > 0; i--)
-            {
-                strBuild.AppendFormat("{0}x^{1}", _coefficients[i], i);
-            }
-            strBuild.Remove(strBuild.Length, 1);
-            return strBuild.ToString();
+            if (ReferenceEquals(this, otherPolynomial))
+                return true;
+            if (ReferenceEquals(otherPolynomial, null))
+                return false;
+
+            if (otherPolynomial.Exponent != Exponent)
+                return false;
+
+            return CompareTo(otherPolynomial) == 0;
         }
 
-        public double GetValueOfPolynomial(double x)
+        public override int GetHashCode() => (int)_coefficient.Max();
+
+        public object Clone() => new Polynomial(this);
+
+        public int CompareTo(Polynomial other)
         {
-            double result = 0;
-            for (int i = CountCoef-1; i >0 ; i++)
+            if (ReferenceEquals(this, other))
+                return 0;
+            if (ReferenceEquals(other, null))
+                throw new NullReferenceException();
+            if (Exponent > other.Exponent)
+                return 1;
+            if (Exponent < other.Exponent)
+                return -1;
+
+            for (int i = 0; i <= Exponent; i++)
             {
-                result += _coefficients[i] * Math.Pow(x, i);
+                if (other[i] < this[i])
+                    return 1;
+                if (other[i] > this[i])
+                    return -1;
             }
-            return result;
+
+            return 0;
         }
     }
 }
