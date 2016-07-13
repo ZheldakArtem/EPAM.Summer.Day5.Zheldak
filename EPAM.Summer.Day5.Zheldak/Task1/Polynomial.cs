@@ -8,9 +8,27 @@ namespace Task1
 {
     public class Polynomial : IEquatable<Polynomial>, ICloneable, IComparable<Polynomial>
     {
-        public int Exponent { get; private set; }
+
         private readonly double[] _coefficient;
-        public double this[int i] => _coefficient[i];
+        public int Exponent { get; }
+
+        public double this[int number]
+        {
+            get
+            {
+                if (number > _coefficient.Length)
+                    throw new ArgumentOutOfRangeException();
+                return _coefficient[number];
+            }
+            private set
+            {
+                if (number > 0 || number < _coefficient.Length)
+                {
+                    this._coefficient[number] = value;
+                }
+                throw new ArgumentOutOfRangeException();
+            }
+        }
 
         public Polynomial(params double[] coefficientArray)
         {
@@ -31,72 +49,72 @@ namespace Task1
             Array.Copy(polynomial._coefficient, _coefficient, polynomial._coefficient.Length);
         }
 
-        public static Polynomial operator +(Polynomial lsh, Polynomial rsh)
+        public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
         {
-            if (lsh == null)
+            if (lhs == null)
                 throw new ArgumentNullException("Argumetn is null");
-            if (rsh == null)
+            if (rhs == null)
                 throw new ArgumentNullException("Argumetn is null");
             int max = 0;
             int min = 0;
             bool choice = true;
-            if (lsh.Exponent >= rsh.Exponent)
+            if (lhs.Exponent >= rhs.Exponent)
             {
-                max = lsh.Exponent;
-                min = rsh.Exponent;
+                max = lhs.Exponent;
+                min = rhs.Exponent;
             }
             else
             {
-                max = rsh.Exponent;
-                min = lsh.Exponent;
+                max = rhs.Exponent;
+                min = lhs.Exponent;
                 choice = false;
             }
             double[] coeficientArray = new double[max + 1];
             if (choice)
-                lsh._coefficient.CopyTo(coeficientArray, 0);
+                lhs._coefficient.CopyTo(coeficientArray, 0);
             else
-                rsh._coefficient.CopyTo(coeficientArray, 0);
+                rhs._coefficient.CopyTo(coeficientArray, 0);
             for (int i = 0; i < min + 1; i++)
             {
                 if (choice)
-                    coeficientArray[i] = coeficientArray[i] + rsh._coefficient[i];
+                    coeficientArray[i] = coeficientArray[i] + rhs._coefficient[i];
                 else
-                    coeficientArray[i] = coeficientArray[i] + lsh._coefficient[i];
+                    coeficientArray[i] = coeficientArray[i] + lhs._coefficient[i];
             }
             return new Polynomial(coeficientArray);
         }
 
-        public static Polynomial Addition(Polynomial lsh, Polynomial rsh)
+        public static Polynomial Addition(Polynomial lhs, Polynomial rhs)
         {
-            return lsh + rsh;
+            return lhs + rhs;
         }
 
-        public static Polynomial operator -(Polynomial lsh, Polynomial rsh)
+        public static Polynomial operator -(Polynomial lhs, Polynomial rhs)
         {
-            if (lsh == null)
+            if (lhs == null)
                 throw new ArgumentNullException("Empty argument");
-            if (rsh == null)
+            if (rhs == null)
                 throw new ArgumentNullException("Empty argument");
-            if (lsh.Exponent > rsh.Exponent)
+            if (lhs.Exponent > rhs.Exponent)
             {
-                double[] coeficientArray = new double[lsh._coefficient.Length];
-                lsh._coefficient.CopyTo(coeficientArray, 0);
-                for (int i = 0; i < rsh.Exponent + 1; i++)
+                double[] coeficientArray = new double[lhs._coefficient.Length];
+                lhs._coefficient.CopyTo(coeficientArray, 0);
+                for (int i = 0; i < rhs.Exponent + 1; i++)
                 {
-                    coeficientArray[i] = coeficientArray[i] - rsh._coefficient[i];
+                    coeficientArray[i] = coeficientArray[i] - rhs._coefficient[i];
                 }
                 return new Polynomial(coeficientArray);
             }
             else
             {
-                double[] coeficientArray = new double[rsh._coefficient.Length];
+                double[] coeficientArray = new double[rhs._coefficient.Length];
                 for (int i = 0; i < coeficientArray.Length; i++)
                 {
-                    coeficientArray[i] = rsh._coefficient[i] * (-1);
+                    coeficientArray[i] = rhs._coefficient[i] * (-1);
                 }
-                for (int i = 0; i < lsh.Exponent + 1; i++)
+                for (int i = 0; i < lhs.Exponent + 1; i++)
                 {
-                    coeficientArray[i] = coeficientArray[i] + lsh._coefficient[i];
+                    coeficientArray[i] = coeficientArray[i] + lhs._coefficient[i];
                 }
                 return new Polynomial(coeficientArray);
             }
@@ -107,64 +125,70 @@ namespace Task1
             return lsh - rsh;
         }
 
-        public static Polynomial operator *(Polynomial lsh, Polynomial rsh)
+        public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
         {
-            if (lsh == null)
+            if (lhs == null)
                 throw new ArgumentNullException("Argumetn is null");
-            if (rsh == null)
+            if (rhs == null)
                 throw new ArgumentNullException("Argumetn is null");
-            double[] coeficientArray = new double[lsh.Exponent + rsh.Exponent + 1];
-            for (int i = 0; i < lsh.Exponent + 1; i++)
+            double[] coeficientArray = new double[lhs.Exponent + rhs.Exponent + 1];
+            for (int i = 0; i < lhs.Exponent + 1; i++)
             {
-                for (int j = 0; j < rsh.Exponent + 1; j++)
+                for (int j = 0; j < rhs.Exponent + 1; j++)
                 {
-                    coeficientArray[i + j] = coeficientArray[i + j] + lsh._coefficient[i] * rsh._coefficient[j];
+                    coeficientArray[i + j] = coeficientArray[i + j] + lhs._coefficient[i] * rhs._coefficient[j];
                 }
             }
             return new Polynomial(coeficientArray);
         }
 
-        public static Polynomial Multiplication(Polynomial lsh, Polynomial rsh)
+        public static Polynomial Multiplication(Polynomial lhs, Polynomial rhs)
         {
-            return lsh * rsh;
+            return lhs * rhs;
         }
 
-        public static bool operator !=(Polynomial lsh, Polynomial rsh)
+        public static bool operator !=(Polynomial lhs, Polynomial rhs)
         {
-            if (ReferenceEquals(lsh, rsh))
-                return false;
-            return !(lsh.Equals(rsh));
+            return !(lhs == rhs);
         }
 
         public static bool operator ==(Polynomial lhs, Polynomial rhs)
         {
-            if (!ReferenceEquals(lhs, null))
-                return lhs.Equals(rhs);
-            return ReferenceEquals(rhs, null);
+            if (ReferenceEquals(lhs, rhs)) return true;
+
+            if (ReferenceEquals(lhs, null)) return false;
+
+            return lhs.Equals(rhs);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            if (obj.GetType() != this.GetType()) return false;
+
             return Equals((Polynomial)obj);
         }
 
         public bool Equals(Polynomial otherPolynomial)
         {
-            if (ReferenceEquals(this, otherPolynomial))
-                return true;
-            if (ReferenceEquals(otherPolynomial, null))
+            if (ReferenceEquals(null, otherPolynomial)) return false;
+
+            if (ReferenceEquals(this, otherPolynomial)) return true;
+
+            if (this._coefficient.Length != otherPolynomial._coefficient.Length)
+
                 return false;
 
-            if (otherPolynomial.Exponent != Exponent)
-                return false;
+            for (var i = 0; i < this._coefficient.Length; i++)
+            {
 
-            return CompareTo(otherPolynomial) == 0;
+                if (!this._coefficient[i].Equals(otherPolynomial._coefficient[i]))
+                    return false;
+            }
+
+            return true;
         }
 
         public override int GetHashCode() => (int)_coefficient.Max();
@@ -199,7 +223,7 @@ namespace Task1
                 throw new ArgumentOutOfRangeException();
 
             double result = 0;
-            for (int i = Exponent ; i >= 0; i--)
+            for (int i = Exponent; i >= 0; i--)
             {
                 result = result + _coefficient[i] * Math.Pow(argument, i);
             }
