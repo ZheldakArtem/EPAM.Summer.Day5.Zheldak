@@ -12,24 +12,6 @@ namespace Task1
         private readonly double[] _coefficient;
         public int Exponent { get; }
 
-        public double this[int number]
-        {
-            get
-            {
-                if (number > _coefficient.Length)
-                    throw new ArgumentOutOfRangeException();
-                return _coefficient[number];
-            }
-            private set
-            {
-                if (number > 0 || number < _coefficient.Length)
-                {
-                    this._coefficient[number] = value;
-                }
-                throw new ArgumentOutOfRangeException();
-            }
-        }
-
         public Polynomial(params double[] coefficientArray)
         {
             if (coefficientArray == null)
@@ -49,12 +31,43 @@ namespace Task1
             Array.Copy(polynomial._coefficient, _coefficient, polynomial._coefficient.Length);
         }
 
+        /// <summary>
+        /// Gets or sets the element at the specified index.
+        /// </summary>
+        /// <returns>
+        /// The element at the specified index.
+        /// </returns>
+        /// <param name="number">The zero-based index of the element to get or set.</param>
+        public double this[int number]
+        {
+            get
+            {
+                if (number > _coefficient.Length)
+                    throw new ArgumentOutOfRangeException();
+                return _coefficient[number];
+            }
+            private set
+            {
+                if (number > 0 || number < _coefficient.Length)
+                {
+                    this._coefficient[number] = value;
+                }
+                throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Addition of two polynomials.
+        /// </summary>
+        /// <param name="lhs">The left polinomials.</param>
+        /// <param name="rhs">The right polinomials.</param>
+        /// <returns>Summ of polinomials</returns>
         public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
         {
             if (lhs == null)
-                throw new ArgumentNullException("Argumetn is null");
+                throw new ArgumentNullException();
             if (rhs == null)
-                throw new ArgumentNullException("Argumetn is null");
+                throw new ArgumentNullException();
             int max = 0;
             int min = 0;
             bool choice = true;
@@ -84,11 +97,23 @@ namespace Task1
             return new Polynomial(coeficientArray);
         }
 
+        /// <summary>
+        /// Overloaded addition operator of two polynomials.
+        /// </summary>
+        /// <param name="lhs">The left polinomials.</param>
+        /// <param name="rhs">The right polinomials.</param>
+        /// <returns></returns>
         public static Polynomial Addition(Polynomial lhs, Polynomial rhs)
         {
             return lhs + rhs;
         }
 
+        /// <summary>
+        /// Overloaded multiplication operator.
+        /// </summary>
+        /// <param name="lhs">The first polynomial.</param>
+        /// <param name="rhs">The second polynomial.</param>
+        /// <returns>The substraction of two polynomials.</returns>
         public static Polynomial operator -(Polynomial lhs, Polynomial rhs)
         {
             if (lhs == null)
@@ -120,11 +145,23 @@ namespace Task1
             }
         }
 
+        /// <summary>
+        /// The substraction of two polynomials.
+        /// </summary>
+        /// <param name="lsh">The first polynomial.</param>
+        /// <param name="rsh">The second polynomial.</param>
+        /// <returns>The substraction of two polynomials.</returns>
         public static Polynomial Subtraction(Polynomial lsh, Polynomial rsh)
         {
             return lsh - rsh;
         }
 
+        /// <summary>
+        /// Overloaded multiplication operator.
+        /// </summary>
+        /// <param name="lhs">The first polynomial.</param>
+        /// <param name="rhs">The second polynomial.</param>
+        /// <returns>Multiplication of two polynomials.</returns>
         public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
         {
             if (lhs == null)
@@ -142,16 +179,36 @@ namespace Task1
             return new Polynomial(coeficientArray);
         }
 
+        /// <summary>
+        /// Multiplication of two polynomials.
+        /// </summary>
+        /// <param name="lhs">The first polynomial.</param>
+        /// <param name="rhs">The second polynomial.</param>
+        /// <returns>Multiplication of two polynomials.</returns>
         public static Polynomial Multiplication(Polynomial lhs, Polynomial rhs)
         {
             return lhs * rhs;
         }
 
+        /// <summary>
+        /// Determines whether two specified polynomials have different values.
+        /// </summary>
+        /// <returns>
+        /// True if the value of <paramref name="lhs"/> is different from the value of <paramref name="rhs"/>; otherwise, false.
+        /// </returns>
+        /// <param name="lhs">The first polynomial to compare, or null. </param><param name="rhs">The second polynomial to compare, or null. </param>
         public static bool operator !=(Polynomial lhs, Polynomial rhs)
         {
             return !(lhs == rhs);
         }
 
+        /// <summary>
+        /// Determines whether two specified polynomials have the same value.
+        /// </summary>
+        /// <returns>
+        /// True if the value of <paramref name="lhs"/> is the same as the value of <paramref name="rhs"/>; otherwise, false.
+        /// </returns>
+        /// <param name="lhs">The first polynomial to compare, or null. </param><param name="rhs">The second polynomial to compare, or null. </param>
         public static bool operator ==(Polynomial lhs, Polynomial rhs)
         {
             if (ReferenceEquals(lhs, rhs)) return true;
@@ -161,6 +218,13 @@ namespace Task1
             return lhs.Equals(rhs);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <returns>
+        /// True if the specified object  is equal to the current object; otherwise, false.
+        /// </returns>
+        /// <param name="obj">The object to compare with the current object. </param>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -171,6 +235,13 @@ namespace Task1
             return Equals((Polynomial)obj);
         }
 
+        /// <summary>
+        /// Determines whether the polynomial is equal to the current polynomial.
+        /// </summary>
+        /// <returns>
+        /// True if the specified polynomial  is equal to the current polynomial; otherwise, false.
+        /// </returns>
+        /// <param name="otherPolynomial">The polynomial to compare with the current polynomial. </param>
         public bool Equals(Polynomial otherPolynomial)
         {
             if (ReferenceEquals(null, otherPolynomial)) return false;
@@ -191,10 +262,29 @@ namespace Task1
             return true;
         }
 
-        public override int GetHashCode() => (int)_coefficient.Max();
+        /// <summary>
+        /// Serves as the hash function.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current object.
+        /// </returns>
+        public override int GetHashCode() => (int)_coefficient.Max().GetHashCode();
 
+        /// <summary>
+        /// Creates a shallow copy of the polynomial.
+        /// </summary>
+        /// <returns>
+        /// A shallow copy of the current polinomial.
+        /// </returns>
         public object Clone() => new Polynomial(this);
 
+        /// <summary>
+        /// Determines whether the current  polinomial precedes, occurs in the same position as, or follows another polinomial in the sort order.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates the relationship of the current polinomial to other, as shown in the following table.Return valueDescription-1 The current instance precedes <paramref name="other"/>.0 The current instance and <paramref name="other"/> are equal.1 The current instance follows <paramref name="other"/>.
+        /// </returns>
+        /// <param name="other">The object to compare with the current instance.</param>
         public int CompareTo(Polynomial other)
         {
             if (ReferenceEquals(this, other))
@@ -217,6 +307,11 @@ namespace Task1
             return 0;
         }
 
+        /// <summary>
+        /// The method calculates the value of a polynomial
+        /// </summary>
+        /// <param name="argument">Argument of polinomial</param>
+        /// <returns>The polynomial value</returns>
         public double GetValue(double argument)
         {
             if (double.IsNaN(argument) || double.IsNegativeInfinity(argument) || double.IsPositiveInfinity(argument))
